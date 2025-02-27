@@ -1,34 +1,140 @@
 import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
 import './App.css'
+import bootstrap from 'bootstrap/dist/js/bootstrap.bundle.min.js'
+import CategoryTable from './components/CategoryTable'
+import Modal from './components/Modal'
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [items, setItems] = useState([])
+  const [editingItem, setEditingItem] = useState(null)
+  const [userInfo, setUserInfo] = useState({ nome: '', email: '', idade: '' })
+  const [step, setStep] = useState(1) // 1: Dados do usuário, 2: Dados da categoria
+
+  // Função para deletar item
+  const handleDelete = async (id) => {
+    if (window.confirm('Tem certeza que deseja deletar este item?')) {
+      try {
+        // Aqui você vai adicionar a chamada para sua API/Backend
+        // await api.delete(`/items/${id}`);
+        
+        // Atualiza a lista removendo o item deletado
+        setItems(items.filter(item => item.id !== id))
+        alert('Item deletado com sucesso!')
+      } catch (error) {
+        console.error('Erro ao deletar:', error)
+        alert('Erro ao deletar o item')
+      }
+    }
+  }
+
+  // Função para abrir o modal de edição
+  const handleEdit = (item) => {
+    setEditingItem({ ...item })
+    setStep(2) // Vai direto para edição da categoria
+  }
+
+  // Função para validar dados do usuário
+  const validateUserInfo = () => {
+    if (!userInfo.nome?.trim()) {
+      alert('O nome é obrigatório!')
+      return false
+    }
+    if (!userInfo.email?.trim()) {
+      alert('O email é obrigatório!')
+      return false
+    }
+    if (!userInfo.idade || userInfo.idade < 0) {
+      alert('A idade deve ser um número positivo!')
+      return false
+    }
+    return true
+  }
+
+  // Função para ir para o próximo passo
+  const handleNextStep = () => {
+    if (validateUserInfo()) {
+      setStep(2)
+    }
+  }
+
+  // Função para salvar as alterações
+  const handleSave = async () => {
+    try {
+      if (!editingItem.nome?.trim()) {
+        alert('O nome da categoria é obrigatório!')
+        return
+      }
+
+      // Aqui você vai adicionar a chamada para sua API/Backend
+      // const dadosCompletos = {
+      //   ...editingItem,
+      //   usuario: userInfo
+      // };
+      // await api.put(`/items/${editingItem.id}`, dadosCompletos);
+      
+      // Atualiza a lista com o item editado
+      setItems(items.map(item => 
+        item.id === editingItem.id ? editingItem : item
+      ))
+      
+      // Fecha o modal usando o Bootstrap
+      const modal = document.getElementById('editModal')
+      const bootstrapModal = bootstrap.Modal.getInstance(modal)
+      bootstrapModal.hide()
+      
+      // Limpa os estados
+      setEditingItem(null)
+      setUserInfo({ nome: '', email: '', idade: '' })
+      setStep(1)
+      alert('Item atualizado com sucesso!')
+    } catch (error) {
+      console.error('Erro ao atualizar:', error)
+      alert('Erro ao atualizar o item')
+    }
+  }
+
+  // Função para resetar o modal quando for fechado
+  const handleCloseModal = () => {
+    setStep(1)
+    setUserInfo({ nome: '', email: '', idade: '' })
+    setEditingItem(null)
+  }
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
+    <div className="container mt-5">
+      <h1 className="mb-4 text-center">Lista de Categorias</h1>
+      
+      <CategoryTable 
+        items={items}
+        onEdit={handleEdit}
+        onDelete={handleDelete}
+      />
+      
+      <div className="text-center mt-4">
+        <button 
+          className="btn btn-success btn-lg"
+          data-bs-toggle="modal" 
+          data-bs-target="#editModal"
+          onClick={() => {
+            setEditingItem({ id: '', nome: '', img_url: '', descricao: '' })
+            setStep(1)
+          }}
+        >
+          <i className="bi bi-plus-circle"></i> Adicionar Nova Categoria
         </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
       </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
+
+      <Modal 
+        step={step}
+        userInfo={userInfo}
+        setUserInfo={setUserInfo}
+        editingItem={editingItem}
+        setEditingItem={setEditingItem}
+        onClose={handleCloseModal}
+        onNext={handleNextStep}
+        onSave={handleSave}
+      />
+    </div>
   )
 }
 
