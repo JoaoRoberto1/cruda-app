@@ -1,9 +1,9 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import CategoryTable from '../components/CategoryTable'
-import Modal from '../components/Modal'
-import bootstrap from 'bootstrap/dist/js/bootstrap.bundle.min.js'
 
 const Categories = () => {
+  const navigate = useNavigate()
   const [items, setItems] = useState([])
   const [editingItem, setEditingItem] = useState(null)
   const [userInfo, setUserInfo] = useState({ nome: '', email: '', idade: '' })
@@ -12,6 +12,9 @@ const Categories = () => {
   const handleDelete = async (id) => {
     if (window.confirm('Tem certeza que deseja deletar este item?')) {
       try {
+        // Aqui você vai adicionar a chamada para sua API/Backend
+        // await api.delete(`/categorias/${id}`)
+        
         setItems(items.filter(item => item.id !== id))
         alert('Item deletado com sucesso!')
       } catch (error) {
@@ -22,8 +25,7 @@ const Categories = () => {
   }
 
   const handleEdit = (item) => {
-    setEditingItem({ ...item })
-    setStep(2)
+    navigate(`/categorias/${item.id}/editar`)
   }
 
   const validateUserInfo = () => {
@@ -59,10 +61,6 @@ const Categories = () => {
         item.id === editingItem.id ? editingItem : item
       ))
       
-      const modal = document.getElementById('editModal')
-      const bootstrapModal = bootstrap.Modal.getInstance(modal)
-      bootstrapModal.hide()
-      
       setEditingItem(null)
       setUserInfo({ nome: '', email: '', idade: '' })
       setStep(1)
@@ -81,38 +79,21 @@ const Categories = () => {
 
   return (
     <div className="page-container">
-      <div className="container mt-5">
-        <h1 className="mb-4 text-center">Lista de Categorias</h1>
+      <div className="container">
+        <div className="d-flex justify-content-between align-items-center mb-4">
+          <h1>Lista de Categorias</h1>
+          <button 
+            className="btn btn-success"
+            onClick={() => navigate('/categorias/novo')}
+          >
+            <i className="bi bi-plus-circle"></i> Nova Categoria
+          </button>
+        </div>
         
         <CategoryTable 
           items={items}
           onEdit={handleEdit}
           onDelete={handleDelete}
-        />
-        
-        <div className="text-center mt-4">
-          <button 
-            className="btn btn-success btn-lg"
-            data-bs-toggle="modal" 
-            data-bs-target="#editModal"
-            onClick={() => {
-              setEditingItem({ id: '', nome: '', img_url: '', descricao: '' })
-              setStep(1)
-            }}
-          >
-            <i className="bi bi-plus-circle"></i> Adicionar Nova Categoria
-          </button>
-        </div>
-
-        <Modal 
-          step={step}
-          userInfo={userInfo}
-          setUserInfo={setUserInfo}
-          editingItem={editingItem}
-          setEditingItem={setEditingItem}
-          onClose={handleCloseModal}
-          onNext={handleNextStep}
-          onSave={handleSave}
         />
       </div>
     </div>

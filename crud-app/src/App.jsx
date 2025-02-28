@@ -1,8 +1,7 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
 import Navbar from './components/Navbar'
-import Home from './pages/Home'
-import Categories from './pages/Categories'
-import About from './pages/About'
+import Categories from './components/pages/Categories'
+import CategoryFormPage from './components/pages/CategoryForm'
 import './App.css'
 import { useState } from 'react'
 import bootstrap from 'bootstrap/dist/js/bootstrap.bundle.min.js'
@@ -111,7 +110,7 @@ function App() {
         <Navbar />
         <main>
           <Routes>
-            <Route path="/" element={<Home />} />
+            <Route path="/" element={<Navigate to="/categorias" replace />} />
             <Route path="/categorias" element={
               <div className="container mt-5">
                 <h1 className="mb-4 text-center">Lista de Categorias</h1>
@@ -148,7 +147,7 @@ function App() {
                 />
               </div>
             } />
-            <Route path="/sobre" element={<About />} />
+            <Route path="/categorias/novo" element={<CategoryFormPage />} />
           </Routes>
         </main>
         <footer className="bg-dark text-light text-center py-3">
