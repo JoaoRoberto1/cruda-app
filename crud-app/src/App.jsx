@@ -1,5 +1,10 @@
-import { useState } from 'react'
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import Navbar from './components/Navbar'
+import Home from './pages/Home'
+import Categories from './pages/Categories'
+import About from './pages/About'
 import './App.css'
+import { useState } from 'react'
 import bootstrap from 'bootstrap/dist/js/bootstrap.bundle.min.js'
 import CategoryTable from './components/CategoryTable'
 import Modal from './components/Modal'
@@ -101,40 +106,56 @@ function App() {
   }
 
   return (
-    <div className="container mt-5">
-      <h1 className="mb-4 text-center">Lista de Categorias</h1>
-      
-      <CategoryTable 
-        items={items}
-        onEdit={handleEdit}
-        onDelete={handleDelete}
-      />
-      
-      <div className="text-center mt-4">
-        <button 
-          className="btn btn-success btn-lg"
-          data-bs-toggle="modal" 
-          data-bs-target="#editModal"
-          onClick={() => {
-            setEditingItem({ id: '', nome: '', img_url: '', descricao: '' })
-            setStep(1)
-          }}
-        >
-          <i className="bi bi-plus-circle"></i> Adicionar Nova Categoria
-        </button>
-      </div>
+    <Router>
+      <div className="app-container">
+        <Navbar />
+        <main>
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/categorias" element={
+              <div className="container mt-5">
+                <h1 className="mb-4 text-center">Lista de Categorias</h1>
+                
+                <CategoryTable 
+                  items={items}
+                  onEdit={handleEdit}
+                  onDelete={handleDelete}
+                />
+                
+                <div className="text-center mt-4">
+                  <button 
+                    className="btn btn-success btn-lg"
+                    data-bs-toggle="modal" 
+                    data-bs-target="#editModal"
+                    onClick={() => {
+                      setEditingItem({ id: '', nome: '', img_url: '', descricao: '' })
+                      setStep(1)
+                    }}
+                  >
+                    <i className="bi bi-plus-circle"></i> Adicionar Nova Categoria
+                  </button>
+                </div>
 
-      <Modal 
-        step={step}
-        userInfo={userInfo}
-        setUserInfo={setUserInfo}
-        editingItem={editingItem}
-        setEditingItem={setEditingItem}
-        onClose={handleCloseModal}
-        onNext={handleNextStep}
-        onSave={handleSave}
-      />
-    </div>
+                <Modal 
+                  step={step}
+                  userInfo={userInfo}
+                  setUserInfo={setUserInfo}
+                  editingItem={editingItem}
+                  setEditingItem={setEditingItem}
+                  onClose={handleCloseModal}
+                  onNext={handleNextStep}
+                  onSave={handleSave}
+                />
+              </div>
+            } />
+            <Route path="/sobre" element={<About />} />
+          </Routes>
+        </main>
+        <footer className="bg-dark text-light text-center py-3">
+          <p className="mb-0">&copy; 2025 Sistema de Categorias. Todos os direitos reservados.</p>
+        </footer>
+      </div>
+    </Router>
   )
 }
 
